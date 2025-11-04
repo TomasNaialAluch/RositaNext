@@ -1,0 +1,25 @@
+{
+  "name": "Rosita - Tienda Online",
+  "short_name": "Rosita",
+  "description": "Descubre los mejores productos en nuestra tienda online",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#BF5065",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/logo-simple.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/logo-sin-fondo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rosita-b76eb.firebaseapp.com/sitemap.xml
+
