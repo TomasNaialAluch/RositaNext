@@ -3,6 +3,7 @@ import { initializeApp, getApps, FirebaseApp } from "firebase/app";
 import { getAnalytics, Analytics } from "firebase/analytics";
 import { getAuth, Auth } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
+import { getFirestore, Firestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -16,30 +17,24 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-let app: FirebaseApp;
+const apps = getApps()
+const app: FirebaseApp = apps.length === 0 ? initializeApp(firebaseConfig) : apps[0]
+
 let analytics: Analytics | null = null;
-let auth: Auth | null = null;
+const auth: Auth = getAuth(app);
+const db: Firestore = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
+// Configurar el proveedor de Google para mejor compatibilidad
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
+googleProvider.addScope('email');
+googleProvider.addScope('profile');
+
 if (typeof window !== 'undefined') {
-  // Solo inicializar en el cliente
-  if (getApps().length === 0) {
-    app = initializeApp(firebaseConfig);
-    analytics = getAnalytics(app);
-    auth = getAuth(app);
-  } else {
-    app = getApps()[0];
-    analytics = getAnalytics(app);
-    auth = getAuth(app);
-  }
-} else {
-  // En el servidor, solo inicializar la app sin analytics
-  if (getApps().length === 0) {
-    app = initializeApp(firebaseConfig);
-  } else {
-    app = getApps()[0];
-  }
+  analytics = getAnalytics(app);
 }
 
-export { app, analytics, auth, googleProvider };
+export { app, analytics, auth, db, googleProvider };
 

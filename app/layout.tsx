@@ -63,7 +63,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
         <meta name="theme-color" content="#BF5065" />
         <link rel="icon" href="/images/logo-simple.png" />
         <link rel="apple-touch-icon" href="/images/logo-simple.png" />
@@ -71,6 +71,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <script
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdilgyg87D9pDIM1Gvs-H5DqtfbTpC3ys&libraries=places&language=es&loading=async"
+          async
+          defer
+        ></script>
       </head>
       <body>
         {children}

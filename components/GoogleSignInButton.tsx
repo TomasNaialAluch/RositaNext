@@ -1,27 +1,88 @@
 'use client'
 
-import { signInWithPopup } from 'firebase/auth'
+import { signInWithRedirect, getRedirectResult } from 'firebase/auth'
 import { auth, googleProvider } from '@/lib/firebase'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-export default function GoogleSignInButton() {
+interface GoogleUserData {
+  email: string
+  displayName: string
+  photoURL: string | null
+  isNewUser: boolean
+}
+
+interface GoogleSignInButtonProps {
+  onGoogleSignInSuccess?: (userData: GoogleUserData) => void
+}
+
+export default function GoogleSignInButton({ onGoogleSignInSuccess }: GoogleSignInButtonProps) {
   const [loading, setLoading] = useState(false)
+
+  // Verificar si hay un resultado de redirección al cargar el componente
+  useEffect(() => {
+    if (!auth) return
+
+    const checkRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth)
+        if (result) {
+          const user = result.user
+          
+          // Verificar si es un usuario nuevo comparando creationTime con lastSignInTime
+          // Si son iguales (o muy cercanos), es un usuario nuevo
+          const creationTime = user.metadata.creationTime
+          const lastSignInTime = user.metadata.lastSignInTime
+          const isNewUser =
+            creationTime === lastSignInTime ||
+            (!!creationTime &&
+              !!lastSignInTime &&
+              Math.abs(new Date(creationTime).getTime() - new Date(lastSignInTime).getTime()) < 5000)
+
+          // Extraer datos del usuario de Google
+          const userData: GoogleUserData = {
+            email: user.email || '',
+            displayName: user.displayName || '',
+            photoURL: user.photoURL,
+            isNewUser
+          }
+
+          // Si hay callback, llamarlo con los datos
+          if (onGoogleSignInSuccess) {
+            onGoogleSignInSuccess(userData)
+          } else {
+            console.log('Usuario autenticado:', user)
+            // Si no hay callback, redirigir o actualizar el estado de la app
+          }
+        }
+      } catch (error: any) {
+        // Ignorar errores de redirección si no hay resultado
+        if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+          console.error('Error al verificar redirección:', error)
+        }
+      }
+    }
+
+    checkRedirectResult()
+  }, [onGoogleSignInSuccess])
 
   const handleGoogleSignIn = async () => {
     if (!auth) return
     
     setLoading(true)
     try {
-      const result = await signInWithPopup(auth, googleProvider)
-      // El usuario ha iniciado sesión exitosamente
-      console.log('Usuario autenticado:', result.user)
-      // Aquí puedes redirigir o actualizar el estado de la app
+      // Usar redirect en lugar de popup para evitar problemas de COOP
+      // Esto redirige al usuario a Google y luego vuelve a la app
+      await signInWithRedirect(auth, googleProvider)
+      // No necesitamos hacer nada más aquí porque el redirect
+      // llevará al usuario a Google y luego volverá
+      // El resultado se manejará en el useEffect cuando regrese
     } catch (error: any) {
       console.error('Error al iniciar sesión:', error)
-      // Aquí puedes mostrar un mensaje de error al usuario
-    } finally {
       setLoading(false)
+      // Aquí puedes mostrar un mensaje de error al usuario
     }
+    // No ponemos setLoading(false) aquí porque el redirect
+    // navega a otra página, así que el componente se desmonta
   }
 
   return (

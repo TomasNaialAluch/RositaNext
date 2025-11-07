@@ -1,0 +1,226 @@
+/* Estilos para la página de Perfil */
+.perfil-content-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Header del perfil */
+.perfil-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.perfil-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  border: 3px solid #BF5065;
+  box-shadow: 0 4px 12px rgba(191, 80, 101, 0.2);
+}
+
+.perfil-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.perfil-avatar-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #BF5065;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(191, 80, 101, 0.2);
+}
+
+.perfil-avatar-initial {
+  font-family: 'Inter', sans-serif;
+  font-size: 3rem;
+  font-weight: 600;
+  color: white;
+}
+
+.perfil-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #0C0D0E;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+}
+
+.perfil-email {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #666;
+  margin: 0;
+  text-align: center;
+}
+
+/* Sección de información */
+.perfil-info-section {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.perfil-section-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0C0D0E;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e5e5e5;
+}
+
+.perfil-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.perfil-info-item:last-child {
+  border-bottom: none;
+}
+
+.perfil-info-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #666;
+}
+
+.perfil-info-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: #0C0D0E;
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+}
+
+/* Contenedor del botón de cerrar sesión */
+.perfil-signout-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+  padding-bottom: 2rem;
+}
+
+.perfil-signout-button {
+  width: 100%;
+  height: 48px;
+  background-color: #BF5065;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, transform 0.1s ease-out;
+  box-shadow: 0 2px 8px rgba(191, 80, 101, 0.3);
+}
+
+.perfil-signout-button:hover:not(:disabled) {
+  background-color: #a03d4f;
+}
+
+.perfil-signout-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.perfil-signout-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Loading state */
+.perfil-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .perfil-content-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .perfil-avatar,
+  .perfil-avatar-placeholder {
+    width: 100px;
+    height: 100px;
+  }
+
+  .perfil-avatar-initial {
+    font-size: 2.5rem;
+  }
+
+  .perfil-name {
+    font-size: 1.5rem;
+  }
+
+  .perfil-email {
+    font-size: 0.9375rem;
+  }
+
+  .perfil-section-title {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .perfil-content-container {
+    padding: 1rem 0.75rem;
+  }
+
+  .perfil-avatar,
+  .perfil-avatar-placeholder {
+    width: 80px;
+    height: 80px;
+  }
+
+  .perfil-avatar-initial {
+    font-size: 2rem;
+  }
+
+  .perfil-name {
+    font-size: 1.25rem;
+  }
+
+  .perfil-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .perfil-info-value {
+    max-width: 100%;
+    text-align: left;
+  }
+}
+

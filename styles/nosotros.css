@@ -1,0 +1,135 @@
+/* Estilos para la página Nosotros */
+.nosotros-content-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Logo principal */
+.nosotros-logo-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+}
+
+.nosotros-logo-main {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Foto de la abuela */
+.nosotros-abuela-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.nosotros-abuela-image {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  object-fit: contain;
+  transform: translateX(10%);
+}
+
+/* Contenedor de la historia */
+.nosotros-history-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.nosotros-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #BF5065;
+  text-align: center;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.nosotros-text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.nosotros-paragraph {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #0C0D0E;
+  line-height: 1.7;
+  text-align: justify;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nosotros-content-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .nosotros-logo-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .nosotros-logo-main {
+    max-width: 250px;
+  }
+
+  .nosotros-abuela-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .nosotros-abuela-image {
+    max-width: 100%;
+  }
+
+  .nosotros-history-container {
+    padding: 1rem;
+    gap: 1.25rem;
+  }
+
+  .nosotros-subtitle {
+    font-size: 1.125rem;
+  }
+
+  .nosotros-paragraph {
+    font-size: 0.9375rem;
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .nosotros-content-container {
+    padding: 1rem 0.75rem;
+  }
+
+  .nosotros-logo-main {
+    max-width: 200px;
+  }
+
+  .nosotros-subtitle {
+    font-size: 1rem;
+  }
+
+  .nosotros-paragraph {
+    font-size: 0.875rem;
+  }
+}
+
