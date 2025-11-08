@@ -19,7 +19,7 @@ export default function AuthLogo({ isShrunk = false, isStatic = false, size = 30
           height={size}
           priority
           unoptimized
-          style={{ width: 'auto', height: 'auto' }}
+          style={{ width: 'auto', height: 'auto', maxWidth: '100%' }}
           className="logo-image logo-shrink"
         />
       </div>
@@ -35,7 +35,7 @@ export default function AuthLogo({ isShrunk = false, isStatic = false, size = 30
         height={size}
         priority
         unoptimized
-        style={{ width: 'auto', height: 'auto' }}
+        style={{ width: 'auto', height: 'auto', maxWidth: '100%' }}
         className={`logo-image ${isShrunk ? 'logo-shrink' : 'logo-grow'}`}
       />
     </div>

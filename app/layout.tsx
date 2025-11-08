@@ -71,11 +71,12 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-        <script
+        {/* Google Maps comentado - causaba conflictos */}
+        {/* <script
           src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdilgyg87D9pDIM1Gvs-H5DqtfbTpC3ys&libraries=places&language=es&loading=async"
           async
           defer
-        ></script>
+        ></script> */}
       </head>
       <body>
         {children}

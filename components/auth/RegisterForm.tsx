@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { auth, db } from '@/lib/firebase'
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
 import FormInput from '@/components/forms/FormInput'
 import AddressInput from '@/components/forms/AddressInput'
 import RadioGroup from '@/components/forms/RadioGroup'
@@ -107,6 +109,28 @@ export default function RegisterForm({ onSwitchToLogin, onRegisterSuccess, isClo
         scrollToFirstError()
       }, 100)
       return
+    }
+
+    // Guardar usuario en Firestore
+    if (auth?.currentUser && db) {
+      try {
+        const userRef = doc(db, 'users', auth.currentUser.uid)
+        await setDoc(userRef, {
+          email: email,
+          fullName: fullName,
+          phone: phone || null,
+          address: address || null,
+          addressType: addressType || null,
+          floor: floor || null,
+          doorbell: doorbell || null,
+          photoURL: initialData?.photoURL || null,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        })
+      } catch (error) {
+        console.error('Error al guardar usuario en Firestore:', error)
+        // Continuar aunque haya error para no bloquear el flujo
+      }
     }
 
     // Si todo está válido, hacer scroll arriba y mostrar animación

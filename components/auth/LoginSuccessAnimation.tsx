@@ -57,7 +57,7 @@ export default function LoginSuccessAnimation({ onComplete }: LoginSuccessAnimat
             height={300}
             priority
             unoptimized
-            style={{ width: 'auto', height: 'auto' }}
+            style={{ width: 'auto', height: 'auto', maxWidth: '100%' }}
             className={`logo-black ${stage === 'transition' ? 'fade-out' : ''}`}
           />
         </div>
@@ -71,7 +71,7 @@ export default function LoginSuccessAnimation({ onComplete }: LoginSuccessAnimat
             height={300}
             priority
             unoptimized
-            style={{ width: 'auto', height: 'auto' }}
+            style={{ width: 'auto', height: 'auto', maxWidth: '100%' }}
             className={`logo-pink ${stage === 'transition' || stage === 'pink' ? 'fade-in' : ''} ${stage === 'shrink' || stage === 'exit' ? 'shrink-up' : ''}`}
           />
         </div>

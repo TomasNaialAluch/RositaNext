@@ -1,0 +1,110 @@
+/* Importar variables CSS */
+@import './variables.css';
+
+/* Estilos para la página de primera animación */
+.first-animation-page {
+  min-height: 100vh;
+  min-height: -webkit-fill-available; /* Para iOS Safari */
+  width: 100%;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Logo grande que cae desde arriba */
+.first-animation-falling-logo {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  opacity: 1;
+  transition: top 3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Cuando tiene la clase falling, el logo cae hacia la posición del navbar (hacia abajo) */
+.first-animation-falling-logo.falling {
+  top: calc(var(--navbar-top-height) + 10px);
+}
+
+.first-animation-falling-logo.positioned {
+  top: calc(var(--navbar-top-height) + 10px);
+}
+
+.first-animation-falling-logo.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.first-animation-logo-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.first-animation-content {
+  flex: 1;
+  width: 100%;
+  margin-top: var(--navbar-top-height);
+  margin-bottom: var(--navbar-bottom-height);
+  min-height: calc(100vh - var(--navbar-top-height) - var(--navbar-bottom-height));
+  min-height: calc(100vh - var(--navbar-top-height) - var(--navbar-bottom-height) - env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.first-animation-welcome {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+  z-index: 10;
+}
+
+.first-animation-welcome.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.first-animation-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+}
+
+.first-animation-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.125rem;
+  color: var(--color-text-light);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Responsive */
+@media (min-width: 640px) {
+  .first-animation-title {
+    font-size: 3rem;
+  }
+  
+  .first-animation-subtitle {
+    font-size: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .first-animation-title {
+    font-size: 3.5rem;
+  }
+  
+  .first-animation-subtitle {
+    font-size: 1.375rem;
+  }
+}
+

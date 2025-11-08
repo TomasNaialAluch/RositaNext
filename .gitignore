@@ -38,3 +38,10 @@ next-env.d.ts
 firebase-debug.log
 firestore-debug.log
 
+# Service Accounts (credenciales sensibles)
+service-accounts/
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+

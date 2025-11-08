@@ -35,6 +35,18 @@ export default function Home() {
   const [showLoginFormSuccess, setShowLoginFormSuccess] = useState(false)
   const [showRegisterSuccess, setShowRegisterSuccess] = useState(false)
 
+  const handleGoogleSignInSuccess = (userData: GoogleUserData) => {
+    if (userData.isNewUser) {
+      // Si es un usuario nuevo, mostrar el formulario de registro con datos prellenados
+      setGoogleUserData(userData)
+      setIsClosingRegister(false)
+      setShowRegisterForm(true)
+    } else {
+      // Si es un usuario existente, mostrar animación de login exitoso
+      setShowLoginSuccess(true)
+    }
+  }
+
   const handleLoginClick = () => {
     setIsClosing(false)
     setShowLoginForm(true)
@@ -96,8 +108,7 @@ export default function Home() {
 
   const handleRegisterSuccessComplete = () => {
     setShowRegisterSuccess(false)
-    // Redirigir a la tienda
-    router.push('/tienda')
+    router.push('/firstanimation')
   }
 
   const handleLoginFormSuccess = () => {
@@ -106,28 +117,12 @@ export default function Home() {
 
   const handleLoginFormSuccessComplete = () => {
     setShowLoginFormSuccess(false)
-    // Aquí puedes redirigir a la tienda o actualizar el estado de la app
-    console.log('Login exitoso completado, redirigir a tienda')
-    // TODO: Redirigir a la tienda o actualizar estado de autenticación
-  }
-
-  const handleGoogleSignInSuccess = (userData: GoogleUserData) => {
-    if (userData.isNewUser) {
-      // Si es un usuario nuevo, mostrar el formulario de registro con datos prellenados
-      setGoogleUserData(userData)
-      setIsClosingRegister(false)
-      setShowRegisterForm(true)
-    } else {
-      // Si es un usuario existente, mostrar animación de login exitoso
-      setShowLoginSuccess(true)
-    }
+    router.push('/firstanimation')
   }
 
   const handleLoginSuccessComplete = () => {
     setShowLoginSuccess(false)
-    // Aquí puedes redirigir a la tienda o actualizar el estado de la app
-    console.log('Login exitoso completado, redirigir a tienda')
-    // TODO: Redirigir a la tienda o actualizar estado de autenticación
+    router.push('/firstanimation')
   }
 
   // Determinar qué vista mostrar

@@ -1,8 +1,9 @@
 'use client'
 
-import { signInWithRedirect, getRedirectResult } from 'firebase/auth'
-import { auth, googleProvider } from '@/lib/firebase'
-import { useState, useEffect } from 'react'
+import { signInWithPopup } from 'firebase/auth'
+import { auth, googleProvider, db } from '@/lib/firebase'
+import { doc, getDoc } from 'firebase/firestore'
+import { useState } from 'react'
 
 interface GoogleUserData {
   email: string
@@ -18,71 +19,41 @@ interface GoogleSignInButtonProps {
 export default function GoogleSignInButton({ onGoogleSignInSuccess }: GoogleSignInButtonProps) {
   const [loading, setLoading] = useState(false)
 
-  // Verificar si hay un resultado de redirección al cargar el componente
-  useEffect(() => {
-    if (!auth) return
-
-    const checkRedirectResult = async () => {
-      try {
-        const result = await getRedirectResult(auth)
-        if (result) {
-          const user = result.user
-          
-          // Verificar si es un usuario nuevo comparando creationTime con lastSignInTime
-          // Si son iguales (o muy cercanos), es un usuario nuevo
-          const creationTime = user.metadata.creationTime
-          const lastSignInTime = user.metadata.lastSignInTime
-          const isNewUser =
-            creationTime === lastSignInTime ||
-            (!!creationTime &&
-              !!lastSignInTime &&
-              Math.abs(new Date(creationTime).getTime() - new Date(lastSignInTime).getTime()) < 5000)
-
-          // Extraer datos del usuario de Google
-          const userData: GoogleUserData = {
-            email: user.email || '',
-            displayName: user.displayName || '',
-            photoURL: user.photoURL,
-            isNewUser
-          }
-
-          // Si hay callback, llamarlo con los datos
-          if (onGoogleSignInSuccess) {
-            onGoogleSignInSuccess(userData)
-          } else {
-            console.log('Usuario autenticado:', user)
-            // Si no hay callback, redirigir o actualizar el estado de la app
-          }
-        }
-      } catch (error: any) {
-        // Ignorar errores de redirección si no hay resultado
-        if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-          console.error('Error al verificar redirección:', error)
-        }
-      }
-    }
-
-    checkRedirectResult()
-  }, [onGoogleSignInSuccess])
-
   const handleGoogleSignIn = async () => {
-    if (!auth) return
+    if (!auth || !db) return
     
     setLoading(true)
     try {
-      // Usar redirect en lugar de popup para evitar problemas de COOP
-      // Esto redirige al usuario a Google y luego vuelve a la app
-      await signInWithRedirect(auth, googleProvider)
-      // No necesitamos hacer nada más aquí porque el redirect
-      // llevará al usuario a Google y luego volverá
-      // El resultado se manejará en el useEffect cuando regrese
+      // Usar popup en lugar de redirect para mantener el estado
+      const result = await signInWithPopup(auth, googleProvider)
+      const user = result.user
+      
+      // Verificar si el usuario existe en Firestore
+      const userDocRef = doc(db, 'users', user.uid)
+      const userDoc = await getDoc(userDocRef)
+      const existsInFirestore = userDoc.exists()
+
+      // Extraer datos del usuario de Google
+      const userData: GoogleUserData = {
+        email: user.email || '',
+        displayName: user.displayName || '',
+        photoURL: user.photoURL,
+        isNewUser: !existsInFirestore // Si no existe en Firestore, es nuevo
+      }
+
+      // Llamar al callback con los datos
+      if (onGoogleSignInSuccess) {
+        onGoogleSignInSuccess(userData)
+      }
     } catch (error: any) {
       console.error('Error al iniciar sesión:', error)
+      // Si el usuario cierra el popup, no es un error crítico
+      if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+        alert('Error al iniciar sesión con Google. Por favor, intenta de nuevo.')
+      }
+    } finally {
       setLoading(false)
-      // Aquí puedes mostrar un mensaje de error al usuario
     }
-    // No ponemos setLoading(false) aquí porque el redirect
-    // navega a otra página, así que el componente se desmonta
   }
 
   return (

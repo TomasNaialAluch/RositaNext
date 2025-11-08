@@ -32,22 +32,22 @@ export default function TiendaPage() {
       setIsInitialLoad(true)
       setStage('logo-falling')
       
-      // Etapa 1: Logo bajando desde arriba (1 segundo)
+      // Etapa 1: Logo bajando desde arriba (2 segundos)
       const timer1 = setTimeout(() => {
         setStage('logo-positioned')
-      }, 1000)
+      }, 2000)
 
       // Etapa 2: Logo en posición, empezar a expandir navbar (0.5 segundos después)
       const timer2 = setTimeout(() => {
         setStage('navbar-expanding')
-      }, 1500)
+      }, 2500)
 
       // Etapa 3: Navbar completamente expandido (1 segundo después)
       const timer3 = setTimeout(() => {
         setStage('complete')
         // Marcar que ya se animó
         sessionStorage.setItem('shopNavbarAnimated', 'true')
-      }, 2500)
+      }, 3500)
 
       return () => {
         clearTimeout(timer1)
