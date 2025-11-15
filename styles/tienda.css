@@ -218,11 +218,24 @@
   border-top: 1px solid #f0f0f0;
 }
 
+.product-card-price-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .product-card-price {
   font-family: 'Inter', sans-serif;
   font-size: 1.125rem;
   font-weight: 700;
   color: #BF5065;
+}
+
+.product-card-subinfo {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #666;
 }
 
 .product-card-add-button {
@@ -653,6 +666,13 @@
   color: #BF5065;
 }
 
+.product-modal-subinfo {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
 .product-modal-section {
   display: flex;
   flex-direction: column;
@@ -868,6 +888,14 @@
   color: #0C0D0E;
   margin: 0;
   text-align: center;
+}
+
+.quick-add-modal-subinfo {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  color: #666;
+  text-align: center;
+  margin: -0.75rem 0 0;
 }
 
 .quick-add-modal-section {

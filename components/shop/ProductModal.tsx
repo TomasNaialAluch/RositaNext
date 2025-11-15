@@ -32,8 +32,16 @@ export default function ProductModal({ product, isOpen, onClose, onAddToCart }: 
   const [selectedCut, setSelectedCut] = useState<string>('')
 
   useEffect(() => {
-    setQuantity(1)
-    setUnitType(product.unitType || 'kg')
+    const initialUnitType = product.unitType || 'kg'
+    const initialQuantity =
+      initialUnitType === 'kg'
+        ? product.minQuantity && product.minQuantity > 0
+          ? product.minQuantity
+          : 1
+        : 1
+
+    setQuantity(initialQuantity)
+    setUnitType(initialUnitType)
     setSelectedCut('')
   }, [product])
 
@@ -57,6 +65,13 @@ export default function ProductModal({ product, isOpen, onClose, onAddToCart }: 
     }).format(price)
   }
 
+  const isKg = unitType === 'kg'
+  const minQuantity =
+    isKg && product.minQuantity && product.minQuantity > 0 ? product.minQuantity : isKg ? 1 : 1
+  const step = isKg ? Math.min(0.25, minQuantity) : 1
+  const avgUnitWeight =
+    product.avgUnitWeight && product.unitType === 'unidad' ? product.avgUnitWeight : null
+
   const handleAddToCart = () => {
     onAddToCart({
       productId: product.id,
@@ -66,7 +81,7 @@ export default function ProductModal({ product, isOpen, onClose, onAddToCart }: 
     })
     onClose()
     // Resetear estado
-    setQuantity(1)
+    setQuantity(minQuantity)
     setSelectedCut('')
   }
 
@@ -114,6 +129,11 @@ export default function ProductModal({ product, isOpen, onClose, onAddToCart }: 
             <div className="product-modal-price">
               {formatPrice(product.price)} {unitType === 'kg' ? '/ kg' : '/ unidad'}
             </div>
+            {avgUnitWeight ? (
+              <div className="product-modal-subinfo">
+                Peso promedio por unidad: {avgUnitWeight} kg
+              </div>
+            ) : null}
 
             {/* Selección de cantidad */}
             <div className="product-modal-section">
@@ -123,7 +143,12 @@ export default function ProductModal({ product, isOpen, onClose, onAddToCart }: 
               <div className="product-modal-quantity">
                 <button
                   className="product-modal-quantity-btn"
-                  onClick={() => setQuantity(Math.max(0.5, quantity - (unitType === 'kg' ? 0.5 : 1)))}
+                  onClick={() =>
+                    setQuantity(prev => {
+                      const newValue = prev - step
+                      return Math.max(minQuantity, parseFloat(newValue.toFixed(2)))
+                    })
+                  }
                 >
                   −
                 </button>
@@ -133,14 +158,16 @@ export default function ProductModal({ product, isOpen, onClose, onAddToCart }: 
                   value={quantity}
                   onChange={(e) => {
                     const value = parseFloat(e.target.value) || 0
-                    setQuantity(Math.max(unitType === 'kg' ? 0.5 : 1, value))
+                    setQuantity(Math.max(minQuantity, value))
                   }}
-                  min={unitType === 'kg' ? 0.5 : 1}
-                  step={unitType === 'kg' ? 0.5 : 1}
+                  min={minQuantity}
+                  step={step}
                 />
                 <button
                   className="product-modal-quantity-btn"
-                  onClick={() => setQuantity(quantity + (unitType === 'kg' ? 0.5 : 1))}
+                  onClick={() =>
+                    setQuantity(prev => parseFloat((prev + step).toFixed(2)))
+                  }
                 >
                   +
                 </button>

@@ -9,12 +9,14 @@ interface ProductCardProps {
   name: string
   description?: string
   price: number
+  unitType?: 'kg' | 'unidad'
+  avgUnitWeight?: number | null
   image?: string
   onCardClick: () => void
   onAddToCart: (e: React.MouseEvent) => void
 }
 
-export default function ProductCard({ id, name, description, price, image, onCardClick, onAddToCart }: ProductCardProps) {
+export default function ProductCard({ id, name, description, price, unitType = 'kg', avgUnitWeight, image, onCardClick, onAddToCart }: ProductCardProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -47,7 +49,14 @@ export default function ProductCard({ id, name, description, price, image, onCar
           <p className="product-card-description">{description}</p>
         )}
         <div className="product-card-footer">
-          <span className="product-card-price">{formatPrice(price)}</span>
+          <div className="product-card-price-wrapper">
+            <span className="product-card-price">
+              {formatPrice(price)} {unitType === 'kg' ? '/ kg' : '/ unidad'}
+            </span>
+            {unitType === 'unidad' && avgUnitWeight ? (
+              <span className="product-card-subinfo">Peso promedio: {avgUnitWeight} kg</span>
+            ) : null}
+          </div>
           <button
             className="product-card-add-button"
             onClick={(e) => {

@@ -19,6 +19,9 @@ interface Product {
   image?: string
   category: 'vacuno' | 'cerdo' | 'pollo' | 'otros'
   preparation?: string[]
+  unitType?: 'kg' | 'unidad'
+  minQuantity?: number
+  avgUnitWeight?: number | null
   [key: string]: any
 }
 
@@ -214,6 +217,8 @@ export default function TiendaContent() {
               name={product.name}
               description={product.description}
               price={product.price}
+            unitType={product.unitType}
+            avgUnitWeight={product.avgUnitWeight}
               image={product.image}
               onCardClick={() => handleCardClick(product)}
               onAddToCart={(e) => handleQuickAdd(product, e)}

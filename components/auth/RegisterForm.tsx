@@ -124,6 +124,7 @@ export default function RegisterForm({ onSwitchToLogin, onRegisterSuccess, isClo
           floor: floor || null,
           doorbell: doorbell || null,
           photoURL: initialData?.photoURL || null,
+          role: 'user',
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         })
