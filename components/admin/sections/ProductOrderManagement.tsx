@@ -130,7 +130,7 @@ export default function ProductOrderManagement() {
         <h2 className="admin-section-title">Orden de Productos</h2>
         <div className="admin-empty-state">
           <p>No hay productos disponibles para ordenar.</p>
-          <p>Agrega productos primero desde la sección "Agregar Productos".</p>
+          <p>Agrega productos primero desde la sección &quot;Agregar Productos&quot;.</p>
         </div>
       </div>
     )

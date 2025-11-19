@@ -17,7 +17,7 @@ interface Product {
   price: number
   image?: string
   category: 'vacuno' | 'cerdo' | 'pollo' | 'otros'
-  preparation?: string[]
+  preparation?: string[] | null
   unitType?: 'kg' | 'unidad'
   minQuantity?: number
   avgUnitWeight?: number | null
