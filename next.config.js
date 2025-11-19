@@ -6,7 +6,7 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   // Configuración para Firebase Hosting - export estático para mejor SEO
-  // output: 'export', // Comentado temporalmente para desarrollo
+  output: 'export', // Habilitado para producción
   trailingSlash: true,
   // Configuración de imágenes (desactivado para export estático)
   images: {
