@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { HiShoppingBag } from 'react-icons/hi2'
 import Image from 'next/image'
+import { useCart } from '@/contexts/CartContext'
+import CartItem from './CartItem'
 
 interface CartDrawerProps {
   isOpen: boolean
@@ -13,6 +15,7 @@ interface CartDrawerProps {
 
 export default function CartDrawer({ isOpen, onClose, total }: CartDrawerProps) {
   const router = useRouter()
+  const { cartItems, cartTotal } = useCart()
   const [isAnimating, setIsAnimating] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [dragStartY, setDragStartY] = useState(0)
@@ -179,10 +182,15 @@ export default function CartDrawer({ isOpen, onClose, total }: CartDrawerProps) 
           </div>
 
           <div className="cart-drawer-items">
-            {/* Aquí irán los items del carrito */}
-            <div className="cart-empty-message">
-              <p>Tu carrito está vacío</p>
-            </div>
+            {cartItems.length === 0 ? (
+              <div className="cart-empty-message">
+                <p>Tu carrito está vacío</p>
+              </div>
+            ) : (
+              cartItems.map((item) => (
+                <CartItem key={item.id} item={item} />
+              ))
+            )}
           </div>
         </div>
 
@@ -191,7 +199,7 @@ export default function CartDrawer({ isOpen, onClose, total }: CartDrawerProps) 
           <div className="cart-footer-content">
             <div className="cart-footer-total">
               <span className="cart-footer-total-label">Total:</span>
-              <span className="cart-footer-total-amount">{formatPrice(total)}</span>
+              <span className="cart-footer-total-amount">{formatPrice(cartTotal)}</span>
             </div>
             <button 
               className="cart-footer-checkout-btn"
@@ -199,6 +207,7 @@ export default function CartDrawer({ isOpen, onClose, total }: CartDrawerProps) 
                 onClose()
                 router.push('/checkout')
               }}
+              disabled={cartItems.length === 0}
             >
               Ir a checkout
             </button>

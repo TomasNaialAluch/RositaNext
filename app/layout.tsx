@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import CartProviderWrapper from '@/components/providers/CartProviderWrapper'
 
 export const metadata: Metadata = {
   title: {
@@ -79,7 +80,9 @@ export default function RootLayout({
         ></script> */}
       </head>
       <body>
-        {children}
+        <CartProviderWrapper>
+          {children}
+        </CartProviderWrapper>
       </body>
     </html>
   )

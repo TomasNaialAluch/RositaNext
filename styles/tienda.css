@@ -231,6 +231,13 @@
   color: #BF5065;
 }
 
+.product-card-unit-price {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #888;
+}
+
 .product-card-subinfo {
   font-family: 'Inter', sans-serif;
   font-size: 0.75rem;

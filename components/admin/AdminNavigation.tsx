@@ -1,8 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-
-type AdminSection = 'products' | 'users' | 'orders' | 'settings'
+import type { AdminSection } from './types'
 
 interface NavItem {
   id: AdminSection
@@ -12,19 +10,23 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: 'products', label: 'Productos', path: '/admin/products' },
+  { id: 'products', label: 'Agregar Productos', path: '/admin/products' },
+  { id: 'edit-products', label: 'Editar Productos', path: '/admin/edit-products' },
+  { id: 'order-products', label: 'Orden de Productos', path: '/admin/order-products' },
   { id: 'users', label: 'Usuarios', path: '/admin/users', disabled: true },
-  { id: 'orders', label: 'Pedidos', path: '/admin/orders', disabled: true },
+  { id: 'orders', label: 'Pedidos', path: '/admin/orders', disabled: false },
   { id: 'settings', label: 'Configuración', path: '/admin/settings', disabled: true }
 ]
 
-export default function AdminNavigation() {
-  const [activeSection, setActiveSection] = useState<AdminSection>('products')
+interface AdminNavigationProps {
+  activeSection: AdminSection
+  onSectionChange: (section: AdminSection) => void
+}
 
+export default function AdminNavigation({ activeSection, onSectionChange }: AdminNavigationProps) {
   const handleNavClick = (item: NavItem) => {
     if (item.disabled) return
-    setActiveSection(item.id)
-    // En el futuro aquí se puede agregar navegación con router.push(item.path)
+    onSectionChange(item.id)
   }
 
   return (
@@ -36,6 +38,7 @@ export default function AdminNavigation() {
               className={`admin-nav-item ${activeSection === item.id ? 'active' : ''} ${item.disabled ? 'disabled' : ''}`}
               onClick={() => handleNavClick(item)}
               disabled={item.disabled}
+              type="button"
             >
               {item.label}
               {item.disabled && <span className="admin-nav-badge">Próximamente</span>}

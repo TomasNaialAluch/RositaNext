@@ -11,7 +11,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyCdilgyg87D9pDIM1Gvs-H5DqtfbTpC3ys",
   authDomain: "rosita-b76eb.firebaseapp.com",
   projectId: "rosita-b76eb",
-  storageBucket: "rosita-b76eb.appspot.com",
+  storageBucket: "rosita-b76eb.firebasestorage.app",
   messagingSenderId: "778473943709",
   appId: "1:778473943709:web:a44d114c61ab7456f99a74",
   measurementId: "G-JHC9CKT0BS"

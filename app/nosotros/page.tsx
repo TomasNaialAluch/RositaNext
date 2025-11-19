@@ -5,11 +5,14 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import TopNavbar from '@/components/shop/TopNavbar'
 import BottomNavbar from '@/components/shop/BottomNavbar'
+import CartDrawer from '@/components/shop/CartDrawer'
+import { CartProvider, useCart } from '@/contexts/CartContext'
 import '@/styles/shop.css'
 import '@/styles/nosotros.css'
 
-export default function NosotrosPage() {
+function NosotrosContent() {
   const router = useRouter()
+  const { cartOpen, openCart, closeCart, cartTotal, showCart } = useCart()
   const [stage, setStage] = useState<'logo-falling' | 'logo-positioned' | 'navbar-expanding' | 'complete'>('complete')
   const [isInitialLoad, setIsInitialLoad] = useState(false)
 
@@ -21,29 +24,30 @@ export default function NosotrosPage() {
       setIsInitialLoad(false)
       // Aparecer inmediatamente sin animación
       setStage('complete')
-    } else {
-      // Si es la primera vez, hacer animación inicial
-      setIsInitialLoad(true)
-      setStage('logo-falling')
-      
-      const timer1 = setTimeout(() => {
-        setStage('logo-positioned')
-      }, 1000)
+      return
+    }
+    
+    // Si es la primera vez, hacer animación inicial
+    setIsInitialLoad(true)
+    setStage('logo-falling')
+    
+    const timer1 = setTimeout(() => {
+      setStage('logo-positioned')
+    }, 1000)
 
-      const timer2 = setTimeout(() => {
-        setStage('navbar-expanding')
-      }, 1500)
+    const timer2 = setTimeout(() => {
+      setStage('navbar-expanding')
+    }, 1500)
 
-      const timer3 = setTimeout(() => {
-        setStage('complete')
-        sessionStorage.setItem('shopNavbarAnimated', 'true')
-      }, 2500)
+    const timer3 = setTimeout(() => {
+      setStage('complete')
+      sessionStorage.setItem('shopNavbarAnimated', 'true')
+    }, 2500)
 
-      return () => {
-        clearTimeout(timer1)
-        clearTimeout(timer2)
-        clearTimeout(timer3)
-      }
+    return () => {
+      clearTimeout(timer1)
+      clearTimeout(timer2)
+      clearTimeout(timer3)
     }
   }, [])
 
@@ -101,17 +105,56 @@ export default function NosotrosPage() {
               </p>
             </div>
           </div>
+
+          {/* Información del frigorífico */}
+          <div className="nosotros-frigorifico-container">
+            <h3 className="nosotros-frigorifico-title">
+              Nuestro Frigorífico
+            </h3>
+            <p className="nosotros-frigorifico-description">
+              Rosita opera desde <strong>Frigorífico La Trinidad S.A.</strong>, un establecimiento con años de experiencia en el procesamiento y distribución de carnes de la más alta calidad. Trabajamos directamente con ellos para garantizar la frescura y calidad de cada corte que llega a tu mesa.
+            </p>
+            <p className="nosotros-frigorifico-description" style={{ marginTop: '1rem' }}>
+              <strong>Dirección:</strong> José Enrique Rodó 6341, Mataderos
+            </p>
+          </div>
+
+          {/* Información de contacto */}
+          <div className="nosotros-whatsapp-container">
+            <p className="nosotros-frigorifico-description">
+              <strong>WhatsApp:</strong> +54 9 11 6624-6009
+            </p>
+          </div>
         </div>
       </main>
 
       {/* Barra de navegación inferior */}
-      <BottomNavbar 
-        stage={stage} 
-        activeItem="nosotros"
-        onNavigate={handleNavigate}
-        isInitialLoad={isInitialLoad}
+      {!cartOpen && (
+        <BottomNavbar 
+          stage={stage} 
+          showCart={showCart}
+          onCartOpen={openCart}
+          activeItem="nosotros"
+          onNavigate={handleNavigate}
+          isInitialLoad={isInitialLoad}
+        />
+      )}
+
+      {/* Drawer del carrito */}
+      <CartDrawer 
+        isOpen={cartOpen} 
+        onClose={closeCart}
+        total={cartTotal}
       />
     </div>
+  )
+}
+
+export default function NosotrosPage() {
+  return (
+    <CartProvider>
+      <NosotrosContent />
+    </CartProvider>
   )
 }
 

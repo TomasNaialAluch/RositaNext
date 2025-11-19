@@ -38,12 +38,21 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background-color: #BF5065;
+  background-color: #fff;
+  border: 3px solid #BF5065;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
   box-shadow: 0 4px 12px rgba(191, 80, 101, 0.2);
+  overflow: hidden;
+}
+
+.perfil-avatar-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 15px;
 }
 
 .perfil-avatar-initial {

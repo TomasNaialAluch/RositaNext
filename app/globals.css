@@ -1,5 +1,6 @@
 /* Importar variables CSS */
 @import '../styles/variables.css';
+@import '../styles/modal.css';
 
 /* Mobile First - Estilos base */
 * {

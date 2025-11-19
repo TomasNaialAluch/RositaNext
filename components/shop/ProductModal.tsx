@@ -127,13 +127,22 @@ export default function ProductModal({ product, isOpen, onClose, onAddToCart }: 
             )}
 
             <div className="product-modal-price">
-              {formatPrice(product.price)} {unitType === 'kg' ? '/ kg' : '/ unidad'}
+              {unitType === 'unidad' && avgUnitWeight ? (
+                <>
+                  {formatPrice(product.price / avgUnitWeight)} / kg
+                  <div className="product-modal-subinfo">
+                    Peso promedio: {avgUnitWeight} kg
+                  </div>
+                  <div className="product-modal-subinfo">
+                    Precio por unidad: {formatPrice(product.price)}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {formatPrice(product.price)} / kg
+                </>
+              )}
             </div>
-            {avgUnitWeight ? (
-              <div className="product-modal-subinfo">
-                Peso promedio por unidad: {avgUnitWeight} kg
-              </div>
-            ) : null}
 
             {/* Selección de cantidad */}
             <div className="product-modal-section">

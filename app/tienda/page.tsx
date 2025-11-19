@@ -2,22 +2,19 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import TopNavbar from '@/components/shop/TopNavbar'
 import BottomNavbar from '@/components/shop/BottomNavbar'
 import CartDrawer from '@/components/shop/CartDrawer'
 import TiendaContent from '@/components/shop/TiendaContent'
-import { CartContext, CartContextType } from '@/contexts/CartContext'
+import { useCart } from '@/contexts/CartContext'
 import '@/styles/shop.css'
 
-export default function TiendaPage() {
+function TiendaContentWrapper() {
+  const { cartOpen, openCart, closeCart, cartTotal, showCart, triggerAddToCartAnimation } = useCart()
   const router = useRouter()
   const [stage, setStage] = useState<'logo-falling' | 'logo-positioned' | 'navbar-expanding' | 'complete'>('complete')
-  const [showCart, setShowCart] = useState(false) // Para cambiar el icono en la barra inferior
-  const [cartOpen, setCartOpen] = useState(false) // Para abrir/cerrar el drawer del carrito
-  const [cartTotal, setCartTotal] = useState(0) // Total del carrito
   const [isInitialLoad, setIsInitialLoad] = useState(false)
-  const [showAddAnimation, setShowAddAnimation] = useState(false) // Para la animación de agregar al carrito
+  const [showAddAnimation, setShowAddAnimation] = useState(false)
 
   useEffect(() => {
     // Verificar si ya se hizo la animación inicial en esta sesión
@@ -57,71 +54,50 @@ export default function TiendaPage() {
     }
   }, [])
 
-  const toggleCart = () => {
-    setShowCart(prev => !prev)
-  }
-
-  const openCart = () => {
-    setCartOpen(true)
-    setShowCart(true)
-  }
-
-  const closeCart = () => {
-    setCartOpen(false)
-    setShowCart(false)
-  }
-
-  const triggerAddToCartAnimation = () => {
-    setShowCart(true)
-    setShowAddAnimation(true)
-    
-    setTimeout(() => {
-      setShowCart(false)
-      setShowAddAnimation(false)
-    }, 2000)
-  }
+  // Escuchar cambios en showCart para la animación
+  useEffect(() => {
+    if (showCart) {
+      setShowAddAnimation(true)
+      const timer = setTimeout(() => {
+        setShowAddAnimation(false)
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [showCart])
 
   return (
-    <CartContext.Provider value={{
-      showCart,
-      cartOpen,
-      toggleCart,
-      setShowCart: (show: boolean) => setShowCart(show),
-      openCart,
-      closeCart,
-      cartTotal,
-      triggerAddToCartAnimation
-    }}>
-      <div className="shop-page">
-        {/* Barra de navegación superior */}
-        <TopNavbar stage={stage} isInitialLoad={isInitialLoad} />
+    <div className="shop-page">
+      {/* Barra de navegación superior */}
+      <TopNavbar stage={stage} isInitialLoad={isInitialLoad} />
 
-        {/* Contenedor principal */}
-        <main className="shop-main-content">
-          <TiendaContent />
-        </main>
+      {/* Contenedor principal */}
+      <main className="shop-main-content">
+        <TiendaContent />
+      </main>
 
-        {/* Barra de navegación inferior */}
-        {!cartOpen && (
-          <BottomNavbar 
-            stage={stage} 
-            showCart={showCart} 
-            showAddAnimation={showAddAnimation}
-            onCartOpen={openCart}
-            activeItem="tienda"
-            onNavigate={(path) => router.push(path)}
-            isInitialLoad={isInitialLoad}
-          />
-        )}
-
-        {/* Drawer del carrito */}
-        <CartDrawer 
-          isOpen={cartOpen} 
-          onClose={closeCart}
-          total={cartTotal}
+      {/* Barra de navegación inferior */}
+      {!cartOpen && (
+        <BottomNavbar 
+          stage={stage} 
+          showCart={showCart} 
+          showAddAnimation={showAddAnimation}
+          onCartOpen={openCart}
+          activeItem="tienda"
+          onNavigate={(path) => router.push(path)}
+          isInitialLoad={isInitialLoad}
         />
-      </div>
-    </CartContext.Provider>
+      )}
+
+      {/* Drawer del carrito */}
+      <CartDrawer 
+        isOpen={cartOpen} 
+        onClose={closeCart}
+        total={cartTotal}
+      />
+    </div>
   )
 }
 
+export default function TiendaPage() {
+  return <TiendaContentWrapper />
+}

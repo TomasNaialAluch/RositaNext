@@ -133,3 +133,201 @@
   }
 }
 
+/* Estilos para la sección del frigorífico */
+.nosotros-frigorifico-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem 1.5rem;
+  margin-top: 2rem;
+  background-color: #fafafa;
+  border-radius: 12px;
+}
+
+.nosotros-frigorifico-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #BF5065;
+  text-align: center;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.nosotros-frigorifico-description {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #0C0D0E;
+  line-height: 1.7;
+  text-align: justify;
+  margin: 0;
+}
+
+.nosotros-frigorifico-description strong {
+  color: #BF5065;
+  font-weight: 600;
+}
+
+/* Contenedor del mapa */
+.nosotros-map-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.nosotros-map-wrapper {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: #f5f5f5;
+}
+
+.nosotros-map-iframe {
+  width: 100%;
+  min-height: 450px;
+  display: block;
+}
+
+.nosotros-map-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background-color: #BF5065;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease-out, transform 0.1s ease-out;
+  text-align: center;
+  align-self: center;
+}
+
+.nosotros-map-link:hover {
+  background-color: #a03d4f;
+  transform: translateY(-1px);
+}
+
+.nosotros-map-link:active {
+  transform: translateY(0);
+}
+
+/* Contenedor de WhatsApp */
+.nosotros-whatsapp-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+.nosotros-whatsapp-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.125rem 2.25rem;
+  background-color: #25D366;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  transition: all 0.2s ease-out;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+  border: none;
+  cursor: pointer;
+}
+
+.nosotros-whatsapp-button:hover {
+  background-color: #20BA5A;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.5);
+}
+
+.nosotros-whatsapp-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.4);
+}
+
+.nosotros-whatsapp-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/* Responsive para la sección del frigorífico */
+@media (max-width: 768px) {
+  .nosotros-frigorifico-container {
+    padding: 1.5rem 1rem;
+    margin-top: 1.5rem;
+    gap: 1.25rem;
+  }
+
+  .nosotros-frigorifico-title {
+    font-size: 1.25rem;
+  }
+
+  .nosotros-frigorifico-description {
+    font-size: 0.9375rem;
+    text-align: left;
+  }
+
+  .nosotros-whatsapp-button {
+    padding: 0.875rem 1.75rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nosotros-frigorifico-container {
+    padding: 1.25rem 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .nosotros-frigorifico-title {
+    font-size: 1.125rem;
+  }
+
+  .nosotros-frigorifico-description {
+    font-size: 0.875rem;
+  }
+
+  .nosotros-map-container {
+    margin-top: 0.75rem;
+  }
+
+  .nosotros-map-iframe {
+    min-height: 350px;
+  }
+
+  .nosotros-map-link {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
+  }
+
+  .nosotros-whatsapp-container {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  .nosotros-whatsapp-button {
+    padding: 1rem 1.75rem;
+    font-size: 1rem;
+    gap: 0.5rem;
+  }
+
+  .nosotros-whatsapp-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+

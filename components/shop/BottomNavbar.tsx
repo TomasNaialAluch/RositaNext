@@ -21,14 +21,14 @@ export default function BottomNavbar({ stage, showCart = false, showAddAnimation
   const logoRef = useRef<HTMLDivElement>(null)
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (stage !== 'complete' || activeItem !== 'tienda') return
+    if (stage !== 'complete' || !onCartOpen) return
     setIsDragging(true)
     setDragStartY(e.touches[0].clientY)
     setDragCurrentY(e.touches[0].clientY)
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || activeItem !== 'tienda') return
+    if (!isDragging || !onCartOpen) return
     const currentY = e.touches[0].clientY
     setDragCurrentY(currentY)
     
@@ -46,7 +46,7 @@ export default function BottomNavbar({ stage, showCart = false, showAddAnimation
   }
 
   const handleClick = () => {
-    if (stage === 'complete' && onCartOpen && activeItem === 'tienda') {
+    if (stage === 'complete' && onCartOpen) {
       onCartOpen()
     }
   }
@@ -56,7 +56,7 @@ export default function BottomNavbar({ stage, showCart = false, showAddAnimation
       <div className="bottom-navbar-content">
         {/* Botones de navegación */}
         <div className="bottom-navbar-nav-items">
-          {activeItem === 'nosotros' || activeItem === 'recetas' ? (
+          {activeItem === 'nosotros' || activeItem === 'recetas' || activeItem === 'pedidos' || activeItem === 'perfil' ? (
             <button 
               className="bottom-navbar-nav-item"
               onClick={() => onNavigate?.('/tienda')}
@@ -91,7 +91,7 @@ export default function BottomNavbar({ stage, showCart = false, showAddAnimation
           onTouchEnd={handleTouchEnd}
           onClick={handleClick}
           style={{
-            cursor: stage === 'complete' && activeItem === 'tienda' ? 'pointer' : 'default',
+            cursor: stage === 'complete' && onCartOpen ? 'pointer' : 'default',
             transform: isDragging 
               ? `translate(-50%, ${-50 + (dragStartY - dragCurrentY)}%)` 
               : 'translate(-50%, -50%)',
@@ -99,7 +99,7 @@ export default function BottomNavbar({ stage, showCart = false, showAddAnimation
           }}
         >
           <div className="bottom-navbar-logo-wrapper">
-            {showCart && activeItem === 'tienda' ? (
+            {showCart && onCartOpen ? (
               <>
                 <HiShoppingBag className="bottom-navbar-cart-icon" />
                 {showAddAnimation && (

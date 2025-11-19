@@ -1,0 +1,264 @@
+/* Modal con estética Rosita */
+
+.rosita-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(12, 13, 14, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.rosita-modal-content {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(191, 80, 101, 0.3);
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rosita-modal-small {
+  width: 100%;
+  max-width: 400px;
+}
+
+.rosita-modal-medium {
+  width: 100%;
+  max-width: 500px;
+}
+
+.rosita-modal-large {
+  width: 100%;
+  max-width: 700px;
+}
+
+/* Header con gradiente Rosita */
+.rosita-modal-header {
+  background: linear-gradient(135deg, #BF5065 0%, #D98E04 100%);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 12px 12px 0 0;
+}
+
+.rosita-modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.rosita-modal-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 1.25rem;
+  transition: background-color 0.2s ease;
+  padding: 0;
+}
+
+.rosita-modal-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.rosita-modal-close:active {
+  transform: scale(0.95);
+}
+
+/* Body del modal */
+.rosita-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  font-family: 'Inter', sans-serif;
+  color: #0C0D0E;
+  max-height: calc(90vh - 80px);
+}
+
+/* Botones dentro del modal */
+.rosita-modal-body button {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Estilos para AlertModal */
+.rosita-alert-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.rosita-alert-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.rosita-alert-success {
+  color: #10b981;
+}
+
+.rosita-alert-error {
+  color: #BF5065;
+}
+
+.rosita-alert-warning {
+  color: #D98E04;
+}
+
+.rosita-alert-info {
+  color: #3b82f6;
+}
+
+.rosita-alert-message {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  color: #0C0D0E;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.rosita-alert-actions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.rosita-alert-button {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rosita-alert-button-success {
+  background-color: #10b981;
+  color: white;
+}
+
+.rosita-alert-button-success:hover {
+  background-color: #059669;
+}
+
+.rosita-alert-button-error {
+  background: linear-gradient(135deg, #BF5065 0%, #D98E04 100%);
+  color: white;
+}
+
+.rosita-alert-button-error:hover {
+  opacity: 0.9;
+}
+
+.rosita-alert-button-warning {
+  background-color: #D98E04;
+  color: white;
+}
+
+.rosita-alert-button-warning:hover {
+  background-color: #b87a03;
+}
+
+.rosita-alert-button-info {
+  background: linear-gradient(135deg, #BF5065 0%, #D98E04 100%);
+  color: white;
+}
+
+.rosita-alert-button-info:hover {
+  opacity: 0.9;
+}
+
+.rosita-alert-button-cancel {
+  background-color: #f3f4f6;
+  color: #0C0D0E;
+  border: 1px solid #e5e7eb;
+}
+
+.rosita-alert-button-cancel:hover {
+  background-color: #e5e7eb;
+}
+
+.rosita-alert-button:active {
+  transform: scale(0.98);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .rosita-modal-content {
+    max-width: 95vw;
+    border-radius: 8px;
+  }
+
+  .rosita-modal-header {
+    padding: 1rem 1.25rem;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .rosita-modal-title {
+    font-size: 1.25rem;
+  }
+
+  .rosita-modal-body {
+    padding: 1.25rem;
+  }
+
+  .rosita-alert-icon {
+    font-size: 2.5rem;
+  }
+
+  .rosita-alert-message {
+    font-size: 0.9375rem;
+  }
+
+  .rosita-alert-actions {
+    flex-direction: column;
+  }
+
+  .rosita-alert-button {
+    width: 100%;
+  }
+}
+

@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
-import { collection, getDocs, query, orderBy } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+import { useState, useMemo } from 'react'
+import { useProductsForShop } from '@/hooks/useProductsForShop'
 import { useCart } from '@/contexts/CartContext'
 import FilterChip from '@/components/shop/FilterChip'
 import SearchInput from '@/components/shop/SearchInput'
@@ -26,9 +25,8 @@ interface Product {
 }
 
 export default function TiendaContent() {
-  const { triggerAddToCartAnimation } = useCart()
-  const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+  const { triggerAddToCartAnimation, addToCart } = useCart()
+  const { products, loading } = useProductsForShop()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedPreparation, setSelectedPreparation] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -41,37 +39,6 @@ export default function TiendaContent() {
   
   // Preparaciones
   const preparations = ['parrilla', 'milanesa', 'horno', 'guiso', 'asado', 'plancha']
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      if (!db) {
-        setLoading(false)
-        return
-      }
-
-      try {
-        const productsRef = collection(db, 'products')
-        const q = query(productsRef, orderBy('created_at', 'desc'))
-        const querySnapshot = await getDocs(q)
-        
-        const productsData: Product[] = []
-        querySnapshot.forEach((doc) => {
-          productsData.push({
-            id: doc.id,
-            ...doc.data()
-          } as Product)
-        })
-        
-        setProducts(productsData)
-      } catch (error) {
-        console.error('Error al cargar productos:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchProducts()
-  }, [])
 
   // Optimización: usar useMemo para filtrar productos (DRY + Performance)
   const filteredProducts = useMemo(() => {
@@ -134,9 +101,35 @@ export default function TiendaContent() {
     unitType: 'kg' | 'unidad'
     cutOption?: string
   }) => {
-    // TODO: Implementar lógica de agregar al carrito
-    console.log('Agregar al carrito:', data)
-    // Aquí se puede integrar con el contexto del carrito
+    // Buscar el producto completo para obtener toda la información
+    const product = products.find(p => p.id === data.productId)
+    
+    if (!product) {
+      console.error('Producto no encontrado:', data.productId)
+      return
+    }
+
+    // Calcular precio según el tipo de unidad
+    let itemPrice = product.price
+    if (data.unitType === 'unidad' && product.avgUnitWeight) {
+      // Si es por unidad, el precio ya está en el producto (precio total de la unidad)
+      itemPrice = product.price
+    } else if (data.unitType === 'kg') {
+      // Si es por kg, usar el precio por kg
+      itemPrice = product.price
+    }
+
+    // Agregar al carrito usando el contexto
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      price: itemPrice,
+      quantity: data.quantity,
+      unitType: data.unitType,
+      cutOption: data.cutOption,
+      image: product.image,
+      avgUnitWeight: product.avgUnitWeight
+    })
     
     // Disparar la animación visual
     triggerAddToCartAnimation()

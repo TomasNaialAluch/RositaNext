@@ -3,24 +3,20 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { onAuthStateChanged } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
+import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore'
+import { auth, db } from '@/lib/firebase'
+import { useCart } from '@/contexts/CartContext'
 import TopNavbar from '@/components/shop/TopNavbar'
 import AddressInput from '@/components/forms/AddressInput'
 import FormInput from '@/components/forms/FormInput'
+import RadioGroup from '@/components/forms/RadioGroup'
+import { useAlertModal } from '@/hooks/useAlertModal'
 import '@/styles/shop.css'
 import '@/styles/checkout.css'
 
-interface CartItem {
-  id: string
-  name: string
-  quantity: number
-  unitType: 'kg' | 'unidad'
-  price: number
-  cutOption?: string
-}
-
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter()
+  const { cartItems, cartTotal, clearCart } = useCart()
   const [stage, setStage] = useState<'logo-falling' | 'logo-positioned' | 'navbar-expanding' | 'complete'>('complete')
   const [isInitialLoad, setIsInitialLoad] = useState(false)
   const [user, setUser] = useState<any>(null)
@@ -31,14 +27,15 @@ export default function CheckoutPage() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
-  
-  // Items del carrito (por ahora mock, después se conectará con el contexto)
-  const [cartItems, setCartItems] = useState<CartItem[]>([])
-  const [cartTotal, setCartTotal] = useState(0)
+  const [addressType, setAddressType] = useState<'casa' | 'departamento' | null>(null)
+  const [floor, setFloor] = useState('')
+  const [doorbell, setDoorbell] = useState('')
+  const [userDataLoaded, setUserDataLoaded] = useState(false)
   
   // Estados de validación
   const [errors, setErrors] = useState<{ phone?: string; address?: string }>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { showInfo, AlertModalComponent } = useAlertModal()
 
   useEffect(() => {
     const hasAnimated = sessionStorage.getItem('shopNavbarAnimated')
@@ -63,17 +60,64 @@ export default function CheckoutPage() {
   }, [])
 
   useEffect(() => {
-    if (!auth) {
+    if (!auth || !db) {
       setLoading(false)
       return
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser)
         setFullName(currentUser.displayName || '')
         setEmail(currentUser.email || '')
-        // TODO: Cargar teléfono y dirección desde Firestore si están guardados
+        
+        // Cargar datos adicionales del usuario desde Firestore
+        try {
+          const userDocRef = doc(db, 'users', currentUser.uid)
+          const userDoc = await getDoc(userDocRef)
+          
+          if (userDoc.exists()) {
+            const userData = userDoc.data()
+            
+            // Prellenar campos con datos del usuario si existen
+            if (userData.phone) {
+              setPhone(userData.phone)
+            }
+            if (userData.address) {
+              setAddress(userData.address)
+            }
+            if (userData.addressType) {
+              setAddressType(userData.addressType)
+            } else {
+              // Si no hay addressType guardado, usar 'casa' por defecto
+              setAddressType('casa')
+            }
+            if (userData.floor) {
+              setFloor(userData.floor)
+            }
+            if (userData.doorbell) {
+              setDoorbell(userData.doorbell)
+            }
+            
+            // Si se cargaron datos, mostrar mensaje informativo
+            if (userData.phone || userData.address) {
+              setUserDataLoaded(true)
+              setTimeout(() => {
+                showInfo(
+                  'Datos cargados',
+                  'Hemos cargado tus datos de perfil. Por favor, revísalos y edítalos si es necesario para este pedido.'
+                )
+              }, 500)
+            }
+          } else {
+            // Si no existe el documento del usuario, establecer valores por defecto
+            setAddressType('casa')
+          }
+        } catch (error) {
+          console.error('Error loading user data:', error)
+          // En caso de error, establecer valores por defecto
+          setAddressType('casa')
+        }
       } else {
         router.push('/')
       }
@@ -81,32 +125,8 @@ export default function CheckoutPage() {
     })
 
     return () => unsubscribe()
-  }, [router])
+  }, [router, showInfo])
 
-  // TODO: Cargar items del carrito desde el contexto o localStorage
-  useEffect(() => {
-    // Mock data por ahora
-    const mockItems: CartItem[] = [
-      {
-        id: '1',
-        name: 'Asado de Tira',
-        quantity: 2,
-        unitType: 'kg',
-        price: 5500,
-        cutOption: 'Milanesa'
-      },
-      {
-        id: '2',
-        name: 'Vacío',
-        quantity: 1.5,
-        unitType: 'kg',
-        price: 4800
-      }
-    ]
-    setCartItems(mockItems)
-    const total = mockItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-    setCartTotal(total)
-  }, [])
 
   const validateForm = () => {
     const newErrors: { phone?: string; address?: string } = {}
@@ -127,6 +147,29 @@ export default function CheckoutPage() {
     return Object.keys(newErrors).length === 0
   }
 
+  // Función helper para eliminar valores undefined de un objeto
+  const removeUndefined = (obj: any): any => {
+    if (obj === null || obj === undefined) {
+      return null
+    }
+    if (Array.isArray(obj)) {
+      return obj.map(item => removeUndefined(item)).filter(item => item !== null && item !== undefined)
+    }
+    if (typeof obj === 'object') {
+      const cleaned: any = {}
+      for (const key in obj) {
+        if (obj[key] !== undefined) {
+          const cleanedValue = removeUndefined(obj[key])
+          if (cleanedValue !== undefined) {
+            cleaned[key] = cleanedValue
+          }
+        }
+      }
+      return cleaned
+    }
+    return obj
+  }
+
   const handleConfirmOrder = async () => {
     if (!validateForm()) {
       return
@@ -135,21 +178,58 @@ export default function CheckoutPage() {
     setIsSubmitting(true)
     
     try {
-      // TODO: Crear el pedido en Firestore
-      console.log('Confirmar pedido:', {
-        userId: user?.uid,
-        items: cartItems,
-        total: cartTotal,
-        shipping: {
-          fullName,
-          email,
-          phone,
-          address
+      // Crear el pedido en Firestore
+      if (db && user) {
+        // Limpiar items del carrito eliminando valores undefined
+        const cleanedItems = cartItems.map(item => {
+          const cleanedItem: any = {
+            id: item.id,
+            productId: item.productId,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            unitType: item.unitType
+          }
+          if (item.cutOption) cleanedItem.cutOption = item.cutOption
+          if (item.image) cleanedItem.image = item.image
+          if (item.avgUnitWeight !== undefined && item.avgUnitWeight !== null) {
+            cleanedItem.avgUnitWeight = item.avgUnitWeight
+          }
+          return cleanedItem
+        })
+
+        // Limpiar shipping eliminando valores undefined
+        const cleanedShipping: any = {
+          fullName: fullName || '',
+          email: email || '',
+          phone: phone || '',
+          address: address || ''
         }
-      })
+        if (addressType) cleanedShipping.addressType = addressType
+        if (floor) cleanedShipping.floor = floor
+        if (doorbell) cleanedShipping.doorbell = doorbell
+
+        const orderData = {
+          userId: user.uid,
+          items: cleanedItems,
+          total: cartTotal,
+          shipping: cleanedShipping,
+          status: 'pending',
+          createdAt: serverTimestamp()
+        }
+        
+        // Limpiar todo el objeto de valores undefined
+        const cleanedOrderData = removeUndefined(orderData)
+        
+        console.log('Guardando pedido en Firebase:', cleanedOrderData)
+        const docRef = await addDoc(collection(db, 'orders'), cleanedOrderData)
+        console.log('Pedido guardado con ID:', docRef.id)
+      } else {
+        console.error('No hay db o user:', { db: !!db, user: !!user })
+      }
       
-      // Simular delay de creación del pedido
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      // Limpiar carrito SOLO después de confirmar el pedido exitosamente
+      await clearCart()
       
       // Redirigir a página de éxito o pedidos
       router.push('/pedidos')
@@ -187,6 +267,39 @@ export default function CheckoutPage() {
           {/* Título */}
           <h1 className="checkout-title">Checkout</h1>
 
+          {/* Mensaje sobre comunicación por WhatsApp */}
+          <div style={{
+            backgroundColor: '#e7f3ff',
+            border: '1px solid #2196F3',
+            borderRadius: '8px',
+            padding: '1rem',
+            marginBottom: '1.5rem',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.75rem'
+          }}>
+            <span style={{ fontSize: '1.25rem' }}>📱</span>
+            <div style={{ flex: 1 }}>
+              <p style={{
+                margin: 0,
+                fontSize: '0.9375rem',
+                fontWeight: '600',
+                color: '#1565C0',
+                marginBottom: '0.25rem'
+              }}>
+                Comunicación por WhatsApp
+              </p>
+              <p style={{
+                margin: 0,
+                fontSize: '0.875rem',
+                color: '#1565C0',
+                lineHeight: '1.5'
+              }}>
+                Después de confirmar tu pedido, nos comunicaremos contigo por WhatsApp para coordinar el pedido y el día de entrega.
+              </p>
+            </div>
+          </div>
+
           {/* Detalle del pedido */}
           <section className="checkout-section">
             <h2 className="checkout-section-title">Detalle del pedido</h2>
@@ -217,6 +330,41 @@ export default function CheckoutPage() {
           {/* Datos del usuario */}
           <section className="checkout-section">
             <h2 className="checkout-section-title">Datos de entrega</h2>
+            
+            {/* Mensaje informativo si se cargaron datos */}
+            {userDataLoaded && (
+              <div style={{
+                backgroundColor: '#fff3cd',
+                border: '1px solid #ffc107',
+                borderRadius: '8px',
+                padding: '1rem',
+                marginBottom: '1.5rem',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '0.75rem'
+              }}>
+                <span style={{ fontSize: '1.25rem' }}>ℹ️</span>
+                <div style={{ flex: 1 }}>
+                  <p style={{
+                    margin: 0,
+                    fontSize: '0.9375rem',
+                    fontWeight: '600',
+                    color: '#856404',
+                    marginBottom: '0.25rem'
+                  }}>
+                    Datos cargados desde tu perfil
+                  </p>
+                  <p style={{
+                    margin: 0,
+                    fontSize: '0.875rem',
+                    color: '#856404',
+                    lineHeight: '1.5'
+                  }}>
+                    Hemos cargado tus datos guardados. Por favor, revísalos y edítalos si es necesario para este pedido.
+                  </p>
+                </div>
+              </div>
+            )}
             
             <div className="checkout-user-info">
               <div className="checkout-info-item">
@@ -275,6 +423,51 @@ export default function CheckoutPage() {
                 <div className="checkout-error-message">{errors.address}</div>
               )}
             </div>
+
+            {/* Tipo de vivienda */}
+            {addressType !== null && (
+              <div className="checkout-form-field">
+                <label className="form-label" style={{ 
+                  display: 'block', 
+                  marginBottom: '0.5rem',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '0.9375rem',
+                  fontWeight: '500',
+                  color: '#0C0D0E'
+                }}>
+                  Tipo de vivienda
+                </label>
+                <RadioGroup
+                  name="checkout_address_type"
+                  value={addressType}
+                  onChange={setAddressType}
+                />
+              </div>
+            )}
+
+            {/* Campos adicionales para departamento */}
+            {addressType === 'departamento' && (
+              <>
+                <div className="checkout-form-field">
+                  <FormInput
+                    type="text"
+                    label="Piso"
+                    placeholder="Ej: 3°, PB"
+                    value={floor}
+                    onChange={(e) => setFloor(e.target.value)}
+                  />
+                </div>
+                <div className="checkout-form-field">
+                  <FormInput
+                    type="text"
+                    label="Timbre"
+                    placeholder="Ej: A, 15"
+                    value={doorbell}
+                    onChange={(e) => setDoorbell(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
           </section>
 
           {/* Botón volver a carrito */}
@@ -305,7 +498,14 @@ export default function CheckoutPage() {
           </button>
         </div>
       </div>
+
+      {/* Modal de alertas */}
+      <AlertModalComponent />
     </div>
   )
+}
+
+export default function CheckoutPage() {
+  return <CheckoutContent />
 }
 

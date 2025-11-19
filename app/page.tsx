@@ -83,7 +83,7 @@ export default function Home() {
   const handleForgotPasswordClick = (e: React.MouseEvent) => {
     e.preventDefault()
     const emailInput = document.querySelector('.form-input[type="text"]') as HTMLInputElement
-    const email = emailInput?.value || 'usuario@ejemplo.com'
+    const email = emailInput?.value || ''
     setUserEmail(email)
     setIsClosing(true)
     setTimeout(() => {
@@ -185,8 +185,20 @@ export default function Home() {
         {showLoginForm && showForgotPassword && (
           <div className={`auth-container ${isClosingForgotPassword ? 'closing' : ''}`}>
             <ForgotPasswordForm
-              maskedEmail={maskEmail(userEmail)}
+              email={userEmail}
+              maskedEmail={maskEmail(userEmail || '')}
               isClosing={isClosingForgotPassword}
+              onEmailChange={(email) => setUserEmail(email)}
+              onCodeVerified={() => {
+                // Volver al login después de resetear contraseña
+                setIsClosingForgotPassword(true)
+                setTimeout(() => {
+                  setShowForgotPassword(false)
+                  setIsClosingForgotPassword(false)
+                  setIsClosing(false)
+                  setShowLoginForm(true)
+                }, 400)
+              }}
             />
           </div>
         )}

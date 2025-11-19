@@ -7,4 +7,8 @@ export function maskEmail(email: string): string {
   return `${visibleStart}${maskedMiddle}@${domain}`
 }
 
+// Generar código de verificación de 6 dígitos
+export function generateVerificationCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString()
+}
 

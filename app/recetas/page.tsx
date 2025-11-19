@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation'
 import { HiBookOpen, HiChevronDown, HiChevronUp } from 'react-icons/hi2'
 import TopNavbar from '@/components/shop/TopNavbar'
 import BottomNavbar from '@/components/shop/BottomNavbar'
+import CartDrawer from '@/components/shop/CartDrawer'
 import FilterChip from '@/components/shop/FilterChip'
 import SearchInput from '@/components/shop/SearchInput'
+import { useCart } from '@/contexts/CartContext'
 import '@/styles/tienda.css'
 import '@/styles/shop.css'
 import '@/styles/recetas.css'
@@ -24,8 +26,9 @@ interface Receta {
   pasos: string[]
 }
 
-export default function RecetasPage() {
+function RecetasContent() {
   const router = useRouter()
+  const { cartOpen, openCart, closeCart, cartTotal, showCart } = useCart()
   const [stage, setStage] = useState<'logo-falling' | 'logo-positioned' | 'navbar-expanding' | 'complete'>('complete')
   const [isInitialLoad, setIsInitialLoad] = useState(false)
   const [recetas] = useState<Receta[]>([
@@ -341,13 +344,28 @@ export default function RecetasPage() {
       </main>
 
       {/* Barra de navegación inferior */}
-      <BottomNavbar 
-        stage={stage} 
-        activeItem="recetas"
-        onNavigate={handleNavigate}
-        isInitialLoad={isInitialLoad}
+      {!cartOpen && (
+        <BottomNavbar 
+          stage={stage} 
+          showCart={showCart}
+          onCartOpen={openCart}
+          activeItem="recetas"
+          onNavigate={handleNavigate}
+          isInitialLoad={isInitialLoad}
+        />
+      )}
+
+      {/* Drawer del carrito */}
+      <CartDrawer 
+        isOpen={cartOpen} 
+        onClose={closeCart}
+        total={cartTotal}
       />
     </div>
   )
+}
+
+export default function RecetasPage() {
+  return <RecetasContent />
 }
 

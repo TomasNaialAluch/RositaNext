@@ -3,27 +3,42 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { onAuthStateChanged } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore'
+import { auth, db } from '@/lib/firebase'
 import { HiClipboardDocumentList } from 'react-icons/hi2'
 import TopNavbar from '@/components/shop/TopNavbar'
 import BottomNavbar from '@/components/shop/BottomNavbar'
+import CartDrawer from '@/components/shop/CartDrawer'
+import { useCart } from '@/contexts/CartContext'
 import '@/styles/shop.css'
 import '@/styles/pedidos.css'
 
 interface Pedido {
   id: string
   fecha: string
-  estado: 'pendiente' | 'en_preparacion' | 'en_camino' | 'entregado' | 'cancelado'
+  estado: 'pending' | 'pendiente' | 'en_preparacion' | 'en_camino' | 'entregado' | 'cancelado'
   total: number
   items: Array<{
-    nombre: string
-    cantidad: number
-    precio: number
+    name: string
+    quantity: number
+    price: number
+    cutOption?: string
+    unitType?: string
   }>
+  shipping?: {
+    fullName?: string
+    email?: string
+    phone?: string
+    address?: string
+    addressType?: string
+    floor?: string
+    doorbell?: string
+  }
 }
 
-export default function PedidosPage() {
+function PedidosContent() {
   const router = useRouter()
+  const { cartOpen, openCart, closeCart, cartTotal, showCart } = useCart()
   const [stage, setStage] = useState<'logo-falling' | 'logo-positioned' | 'navbar-expanding' | 'complete'>('complete')
   const [isInitialLoad, setIsInitialLoad] = useState(false)
   const [user, setUser] = useState<any>(null)
@@ -64,18 +79,74 @@ export default function PedidosPage() {
   }, [])
 
   useEffect(() => {
-    if (!auth) {
+    if (!auth || !db) {
       setLoading(false)
       return
     }
 
     // Escuchar cambios en el estado de autenticación
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser)
-        // TODO: Cargar pedidos del usuario desde Firestore
-        // Por ahora, dejamos la lista vacía
-        setPedidos([])
+        
+        // Cargar pedidos del usuario desde Firestore
+        try {
+          console.log('Cargando pedidos para usuario:', currentUser.uid)
+          const ordersRef = collection(db, 'orders')
+          
+          // Usar consulta sin orderBy para evitar necesidad de índice compuesto
+          // Ordenaremos manualmente después
+          const q = query(
+            ordersRef,
+            where('userId', '==', currentUser.uid)
+          )
+          
+          const querySnapshot = await getDocs(q)
+          console.log('Pedidos encontrados:', querySnapshot.size)
+          
+          const pedidosData: Pedido[] = []
+          
+          querySnapshot.forEach((doc) => {
+            const data = doc.data()
+            console.log('Pedido encontrado:', doc.id, data)
+            
+            // Convertir createdAt de Firestore Timestamp a ISO string
+            let fechaISO = new Date().toISOString()
+            if (data.createdAt) {
+              if (data.createdAt.toDate) {
+                fechaISO = data.createdAt.toDate().toISOString()
+              } else if (data.createdAt.seconds) {
+                fechaISO = new Date(data.createdAt.seconds * 1000).toISOString()
+              }
+            }
+            
+            pedidosData.push({
+              id: doc.id,
+              fecha: fechaISO,
+              estado: data.status || 'pending',
+              total: data.total || 0,
+              items: data.items || [],
+              shipping: data.shipping || {}
+            })
+          })
+          
+          // Ordenar manualmente por fecha (más reciente primero)
+          pedidosData.sort((a, b) => {
+            const dateA = new Date(a.fecha).getTime()
+            const dateB = new Date(b.fecha).getTime()
+            return dateB - dateA // Más reciente primero
+          })
+          
+          console.log('Pedidos procesados:', pedidosData.length)
+          setPedidos(pedidosData)
+        } catch (error: any) {
+          console.error('Error loading orders:', error)
+          // Si el error menciona índice, mostrar mensaje útil
+          if (error.message && error.message.includes('index')) {
+            console.warn('Nota: Necesitas crear un índice compuesto en Firestore para ordenar por fecha. Por ahora se muestran sin ordenar.')
+          }
+          setPedidos([])
+        }
       } else {
         // Si no hay usuario, redirigir a auth
         router.push('/')
@@ -110,6 +181,7 @@ export default function PedidosPage() {
 
   const getEstadoLabel = (estado: string) => {
     const estados: Record<string, string> = {
+      'pending': 'Pendiente',
       'pendiente': 'Pendiente',
       'en_preparacion': 'En preparación',
       'en_camino': 'En camino',
@@ -121,6 +193,7 @@ export default function PedidosPage() {
 
   const getEstadoClass = (estado: string) => {
     const clases: Record<string, string> = {
+      'pending': 'pedido-estado-pendiente',
       'pendiente': 'pedido-estado-pendiente',
       'en_preparacion': 'pedido-estado-preparacion',
       'en_camino': 'pedido-estado-camino',
@@ -181,9 +254,14 @@ export default function PedidosPage() {
                   <div className="pedido-items">
                     {pedido.items.map((item, index) => (
                       <div key={index} className="pedido-item">
-                        <span className="pedido-item-nombre">{item.nombre}</span>
-                        <span className="pedido-item-cantidad">x{item.cantidad}</span>
-                        <span className="pedido-item-precio">{formatPrice(item.precio * item.cantidad)}</span>
+                        <span className="pedido-item-nombre">
+                          {item.name}
+                          {item.cutOption && ` - ${item.cutOption}`}
+                        </span>
+                        <span className="pedido-item-cantidad">
+                          {item.quantity} {item.unitType === 'kg' ? 'kg' : 'un'}
+                        </span>
+                        <span className="pedido-item-precio">{formatPrice(item.price * item.quantity)}</span>
                       </div>
                     ))}
                   </div>
@@ -200,13 +278,28 @@ export default function PedidosPage() {
       </main>
 
       {/* Barra de navegación inferior */}
-      <BottomNavbar 
-        stage={stage} 
-        activeItem="pedidos"
-        onNavigate={handleNavigate}
-        isInitialLoad={isInitialLoad}
+      {!cartOpen && (
+        <BottomNavbar 
+          stage={stage} 
+          showCart={showCart}
+          onCartOpen={openCart}
+          activeItem="pedidos"
+          onNavigate={handleNavigate}
+          isInitialLoad={isInitialLoad}
+        />
+      )}
+
+      {/* Drawer del carrito */}
+      <CartDrawer 
+        isOpen={cartOpen} 
+        onClose={closeCart}
+        total={cartTotal}
       />
     </div>
   )
+}
+
+export default function PedidosPage() {
+  return <PedidosContent />
 }
 

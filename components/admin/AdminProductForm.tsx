@@ -2,46 +2,10 @@
 
 import { useState } from 'react'
 import { db, storage, auth } from '@/lib/firebase'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, addDoc, getDocs, serverTimestamp } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-
-const CUT_OPTIONS = [
-  'Entero',
-  'Cortado',
-  'Cortado Banderita',
-  'Cortado a 3 Dedos',
-  'Cortado a 5 Dedos',
-  'Bife',
-  'Bife a 1 dedo',
-  'Bife a 2 dedos',
-  'Bife a 3 dedos',
-  'Milanesa',
-  'Picado'
-]
-
-const PREPARATION_METHODS = [
-  'parrilla',
-  'milanesa',
-  'horno',
-  'guiso',
-  'asado',
-  'plancha'
-]
-
-const CATEGORIES = ['vacuno', 'cerdo', 'pollo', 'otros']
-
-interface ProductFormData {
-  name: string
-  description: string
-  category: string
-  pricePerKg: number
-  unitType: 'kg' | 'unidad'
-  minQuantity?: number
-  avgUnitWeight?: number
-  cutOptions: string[]
-  preparation: string[]
-  image: File | null
-}
+import { CUT_OPTIONS, PREPARATION_METHODS, CATEGORIES } from './constants'
+import type { ProductFormData } from './types'
 
 export default function AdminProductForm() {
   const [formData, setFormData] = useState<ProductFormData>({
@@ -194,6 +158,23 @@ export default function AdminProductForm() {
       // Agregar mínimo de venta si es por kilogramo
       if (formData.unitType === 'kg' && formData.minQuantity) {
         productData.minQuantity = formData.minQuantity
+      }
+
+      // Obtener el máximo order existente y asignar uno nuevo
+      try {
+        const productsRef = collection(db, 'products')
+        const productsSnapshot = await getDocs(productsRef)
+        let maxOrder = -1
+        productsSnapshot.forEach((doc) => {
+          const data = doc.data()
+          if (data.order !== undefined && data.order > maxOrder) {
+            maxOrder = data.order
+          }
+        })
+        productData.order = maxOrder + 1
+      } catch {
+        // Si falla, asignar 0 como orden por defecto
+        productData.order = 0
       }
 
       // Guardar en Firestore
